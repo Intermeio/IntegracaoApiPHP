@@ -38,9 +38,8 @@ class Transacoes_model extends CI_Model
         $token = self::getToken();
 
         // Validação para saber se não tiver token não continua o codigo
-        if (empty($token)) {
+        if (empty($token))
             return false;
-        }
 
         // Montando o body da requisição da api para geração do boleto
         $bodyRequest = [
@@ -124,6 +123,78 @@ class Transacoes_model extends CI_Model
         } else {
             return false;
         }
+
+    }
+
+    public function gerarBoletoLote($boleto)
+    {
+        // Chama a função getToken para gerar um novo token
+        $token = self::getToken();
+
+        // Validação para saber se não tiver token não continua o codigo
+        if (empty($token))
+            return false;
+
+        $bodyRequest = [
+            "Boletos" => [
+                [
+                    "Boleto" => [
+                        "Valor" => $boleto['valor'] = "020",
+                        "DataVencimento" => $boleto['dataVencimento'] = "10/10/2020",
+                        "NumeroDocumento" => $boleto['numeroDocumento'] = "123456789",
+                    ],
+                    "Cliente" => [
+                        "NomeRazao" => $boleto['nomeRazao'] = "Zezinho Juarez",
+                        "CpfCnpj" => $boleto['cpfCnpj'] = "14386172084",
+                        "Email" => $boleto['email'] = "jose@gmail.com",
+                        "ApelidoEndereco" => $boleto['apelidoEndereco'] = "endereco 01",
+                        "CEP" => $boleto['cep'] = "03633020",
+                        "Logradouro" => $boleto['logradouro'] = "Rua",
+                        "Endereco" => $boleto['endereco'] = "Francisco Gonzales",
+                        "Numero" => $boleto['numero'] = "94",
+                        "Bairro" => $boleto['bairro'] = "Tatuape",
+                        "Complemento" => $boleto['complemento'] = "Casa",
+                        "Cidade" => $boleto['cidade'] = "Sao Paulo",
+                        "Estado" => $boleto['estado'] = "SP",
+                    ],
+                ],
+                [
+                    "Boleto" => [
+                        "Valor" => $boleto['valor'] = "030",
+                        "DataVencimento" => $boleto['dataVencimento'] = "10/10/2020",
+                        "NumeroDocumento" => $boleto['numeroDocumento'] = "123456789",
+                    ],
+                    "Cliente" => [
+                        "NomeRazao" => $boleto['nomeRazao'] = "Zezinho Ramez",
+                        "CpfCnpj" => $boleto['cpfCnpj'] = "14386172084",
+                        "Email" => $boleto['email'] = "jose.r@teste.com",
+                        "ApelidoEndereco" => $boleto['apelidoEndereco'] = "endereco 01",
+                        "CEP" => $boleto['cep'] = "03633020",
+                        "Logradouro" => $boleto['logradouro'] = "Rua",
+                        "Endereco" => $boleto['endereco'] = "Oswaldo Cruz",
+                        "Numero" => $boleto['numero'] = "94",
+                        "Bairro" => $boleto['bairro'] = "Jabaquara",
+                        "Complemento" => $boleto['complemento'] = "Casa",
+                        "Cidade" => $boleto['cidade'] = "Sao Paulo",
+                        "Estado" => $boleto['estado'] = "SP",
+                    ],
+                ],
+            ]
+        ];
+
+        // Gera o autenticador em base 64
+        $auth = base64_encode("Token:$token, Env:dev");
+        // Faz a requisição na api chamando o metodo na model ApiIntermeio_model
+        $requisicao = $this->ApiIntermeio_model->apiRequest('Boleto/Lote', 'POST', [
+            'Content-Type: application/json',
+            "Authorization: Intermeio $auth",
+        ], $bodyRequest);
+
+        // Retorno da função com validação se tiver resultado ou não
+        if ($requisicao['resultado'] != null)
+            return $requisicao;
+        else
+            return false;
 
     }
 
